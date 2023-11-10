@@ -2,5 +2,8 @@
   "name": "earnie",
   "version": "1.0.0",
   "description": "",
-  "main": "script.js"
+  "main": "script.js",
+  "scripts": {
+    "start": "node script.js"
+  }
 }

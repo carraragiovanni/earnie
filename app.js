@@ -21,3 +21,23 @@ async function fetchConversations() {
 }
 
 document.addEventListener('DOMContentLoaded', fetchConversations);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const supabaseUrl = 'your-supabase-url';
+    const supabaseAnonKey = 'your-supabase-anon-key';
+    const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+            // User is logged in, stay on or redirect to the main page
+            if (window.location.pathname !== '/index.html') {
+                window.location.href = '/index.html';
+            }
+        } else {
+            // User is not logged in, redirect to auth.html
+            if (window.location.pathname !== '/auth.html') {
+                window.location.href = '/auth.html';
+            }
+        }
+    });
+});

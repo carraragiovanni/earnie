@@ -1,11 +1,23 @@
-const express = require("express");
+const supabaseUrl = 'https://wjjenusuwyxispmuwspn.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqamVudXN1d3l4aXNwbXV3c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDcxOTYyMzEsImV4cCI6MjAyMjc3MjIzMX0.pkcb5ZglJR_Me61WYYyqbGwUjDUhRNvfHqJMEvi9AIs';
+const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-const app = express();
+async function fetchConversations() {
+    const { data, error } = await supabase
+        .from('conversations')
+        .select('*');
+    
+    if (error) {
+        console.error('Error fetching conversations:', error);
+    } else {
+        const container = document.getElementById('conversations-container');
+        data.forEach(conversation => {
+            const div = document.createElement('div');
+            div.className = 'conversation';
+            div.textContent = `Conversation ID: ${conversation.conversation_id}`; // Adjust according to your data structure
+            container.appendChild(div);
+        });
+    }
+}
 
-app.get("/", function (req, res) {
-  res.sendFile(__dirname + "/index.html");
-});
-
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Server is running on localhost3000");
-});
+document.addEventListener('DOMContentLoaded', fetchConversations);

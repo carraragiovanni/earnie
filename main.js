@@ -35,3 +35,36 @@ async function fetchConversations() {
         });
     }
 }
+
+document.getElementById('new-conversation-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const phoneNumber = document.getElementById('phone-number').value.trim();
+    const messageBody = document.getElementById('message-body').value.trim();
+    const user = supabase.auth.user();
+
+    if (!phoneNumber || !messageBody || !user) {
+        alert('Missing information');
+        return;
+    }
+
+    // Step 1: Insert the new message into the 'messages' table, assuming each message initiates a new conversation
+    const { data: messageData, error: messageError } = await supabase
+        .from('messages')
+        .insert([
+            // Adjust according to your schema. Example assumes conversation_id is managed internally or through another logic
+            { body: messageBody, phone_number: phoneNumber, user_id: user.id }
+        ]);
+
+    if (messageError) {
+        console.error('Error inserting message:', messageError);
+        alert('Failed to send message.');
+        return;
+    }
+
+    console.log('Message sent:', messageData);
+    alert('Message sent successfully!');
+
+    // After message insertion, you could also call the Telnyx API server-side to send the SMS
+    // This part should be handled securely server-side
+});

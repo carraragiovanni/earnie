@@ -9,6 +9,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <div id="new-conversation-form-container">
+        <h3>Create New Conversation</h3>
+        <form id="new-conversation-form">
+            <input type="text" id="phone-number" placeholder="Phone Number" required>
+            <textarea id="message-body" placeholder="Message Body" maxlength="160" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+    
     <div id="conversations-container"></div>
     <!-- main.js is loaded after the Supabase SDK -->
     <script src="main.js"></script>

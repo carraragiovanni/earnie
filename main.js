@@ -4,16 +4,44 @@ const supabase = window.supabase.createClient(
 );
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Initialize your Supabase client
 
-    // Get current user's details
+    // Attempt to get the current user's details
     const { data: { user }, error } = await supabase.auth.getUser();
 
-    // Redirect if no user is logged in
     if (error || !user) {
         console.error('No user logged in or error fetching user:', error);
         window.location.href = '/auth.html';
         return;
+    }
+
+    // Check if the user exists in your custom users table
+    const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id);
+
+    if (userError) {
+        console.error('Error fetching user from custom users table:', userError);
+        return;
+    }
+
+    // If the user doesn't exist in the custom users table, insert them
+    if (users.length === 0) {
+        const { data: newUser, error: newUserError } = await supabase
+            .from('users')
+            .insert([
+                { id: user.id, email: user.email }
+                // Add any other user details you might have and want to store
+            ]);
+
+        if (newUserError) {
+            console.error('Error inserting user into custom users table:', newUserError);
+            return;
+        }
+
+        console.log('New user added to custom users table:', newUser);
+    } else {
+        console.log('User already exists in custom users table:', users[0]);
     }
 
     // Add event listener for form submission

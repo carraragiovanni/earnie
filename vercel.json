@@ -15,8 +15,5 @@
       "dest": "/index.html",
       "continue": true
     }
-  ],
-  "static": {
-    "public": "public"
-  }
+  ]
 }

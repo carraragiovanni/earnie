@@ -4,8 +4,6 @@ const supabase = window.supabase.createClient(
 );
 
 document.addEventListener('DOMContentLoaded', async () => {
-
-    // Attempt to get the current user's details
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
@@ -14,37 +12,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Check if the user exists in your custom users table
-    const { data: users, error: userError } = await supabase
+    const { data: upsertedUser, error: upsertError } = await supabase
         .from('users')
-        .select('*')
-        .eq('id', user.id);
+        .upsert({ // This method attempts to insert or update if the row already exists
+            id: user.id, // Assuming 'id' is your primary key
+            email: user.email
+            // Add other fields as necessary
+        });
 
-    if (userError) {
-        console.error('Error fetching user from custom users table:', userError);
+    if (upsertError) {
+        console.error('Error upserting user:', upsertError);
         return;
     }
 
-    // If the user doesn't exist in the custom users table, insert them
-    if (users.length === 0) {
-        const { data: newUser, error: newUserError } = await supabase
-            .from('users')
-            .insert([
-                { id: user.id, email: user.email }
-                // Add any other user details you might have and want to store
-            ]);
-
-        if (newUserError) {
-            console.error('Error inserting user into custom users table:', newUserError);
-            return;
-        }
-
-        console.log('New user added to custom users table:', newUser);
-    } else {
-        console.log('User already exists in custom users table:', users[0]);
-    }
-
-    // Add event listener for form submission
+    console.log('User upserted:', upsertedUser);
     document.getElementById('new-conversation-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 

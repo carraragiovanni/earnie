@@ -1,42 +1,32 @@
 const path = require('path');
 
 module.exports = {
-  // Define the entry point of your application
-  entry: './src/app.js',
-
-  // Specify the output configuration
+  mode: 'production', // 'development' or 'production'
+  entry: './src/app.js', // Entry point of your application
   output: {
-    path: path.resolve(__dirname, 'public'), // Output files to the 'public' directory
-    filename: 'bundle.js', // Name of the bundled file
+    path: path.resolve(__dirname, 'public'), // Output directory
+    filename: 'bundle.js', // Output bundle file
   },
-
-  // Configure how modules are resolved
   module: {
     rules: [
       {
-        test: /\.js$/, // Apply this rule to JavaScript files
-        exclude: /node_modules/, // Do not apply the rule to files in node_modules
+        test: /\.js$/, // Apply rule to JavaScript files
+        exclude: /node_modules/, // Exclude the node_modules directory
         use: {
-          loader: 'babel-loader', // Use babel-loader to process these files
+          loader: 'babel-loader', // Use Babel loader for transpiling
           options: {
-            presets: ['@babel/preset-env'], // Use the preset-env Babel preset
+            presets: ['@babel/preset-env'], // Preset used for transpiling
           },
         },
       },
-      // Add more loaders here if you need to load other types of files like CSS or images
+      // Add other loaders here for CSS, images, etc.
     ],
   },
-
-  // Development tooling configurations
-  devtool: 'source-map', // Generate source maps
-
-  // Development server configuration
+  // Optionally configure the webpack-dev-server
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'public'), // Serve content from the 'public' directory
-    },
+    contentBase: path.join(__dirname, 'public'), // Serve content from the 'public' directory
     compress: true, // Enable gzip compression
-    port: 3000, // Serve on port 3000
-    open: true, // Open the browser after the server starts
+    port: 9000, // Port to serve on
+    open: true, // Open the browser after server has been started
   },
 };

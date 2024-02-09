@@ -1,4 +1,5 @@
 // Correct import paths for app.js based on the given structure
+// banana
 import { supabase } from './supabaseClient.js';
 import { checkAuth } from './auth/auth.js'; // Corrected path
 import { fetchConversations } from './db/conversation.js'; // Corrected path

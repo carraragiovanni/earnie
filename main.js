@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // This example simplifies by always creating a new conversation for each message
         const { data: conversationData, error: conversationError } = await supabase
             .from('conversations')
-            .insert([{ phone_number: phoneNumber, user_id: user.id }]);
+            .insert([{ phone_number: phoneNumber, user_id: user.id , ai_assist_enabled: false}]);
 
         if (conversationError) {
             console.error('Error creating conversation:', conversationError);

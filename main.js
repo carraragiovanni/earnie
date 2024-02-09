@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: users, error: userError } = await supabase
         .from('users')
         .select('*')
-        .eq('id', user.id);
+        .eq('user_id', user.id);
 
     if (userError) {
         console.error('Error fetching user from custom users table:', userError);
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { data: newUser, error: newUserError } = await supabase
             .from('users')
             .insert([
-                { id: user.id, email: user.email }
+                { id: user.user_id, email: user.email }
                 // Add any other user details you might have and want to store
             ]);
 

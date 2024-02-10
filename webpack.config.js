@@ -1,44 +1,37 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); // Import the plugin
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
-  mode: 'production', // 'development' or 'production'
-  entry: './src/app.js', // Entry point of your application
+  mode: 'production',
+  entry: './src/app.js',
   output: {
-    path: path.resolve(__dirname, 'dist'), // Output directory adjusted to 'dist'
-    filename: 'bundle.js', // Output bundle file
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
   module: {
     rules: [
       {
-        test: /\.js$/, // Apply rule to JavaScript files
-        exclude: /node_modules/, // Exclude the node_modules directory
+        test: /\.js$/,
+        exclude: /node_modules/,
         use: {
-          loader: 'babel-loader', // Use Babel loader for transpiling
+          loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env'], // Preset used for transpiling
+            presets: ['@babel/preset-env'],
           },
         },
       },
-      // Add other loaders here for CSS, images, etc.
     ],
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'public'), // Serve content from 'public'
-      watch: true, // Watch for changes in the 'public' directory
-    },
-    compress: true,
-    port: 9000,
-    open: true,
-    watchFiles: ['src/**/*', 'dist/**/*'], // Watch for changes in 'src' and 'dist' directories
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html', // Path to your source template
-      // filename: 'index.html' is the default value and can be omitted unless you wish to specify a different name
+      template: './src/index.html',
     }),
-    // Add other plugins here as needed
+    new webpack.DefinePlugin({
+      'process.env.SUPABASE_URL': JSON.stringify(process.env.SUPABASE_URL),
+      'process.env.SUPABASE_ANON_KEY': JSON.stringify(process.env.SUPABASE_ANON_KEY),
+    }),
+    new CleanWebpackPlugin(),
   ],
-  // Configure other plugins if needed
 };

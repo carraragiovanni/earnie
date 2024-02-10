@@ -1,19 +1,18 @@
-// Correct import paths for app.js based on the given structure
-// banana
-import { supabase } from './supabaseClient.js';
-import { checkAuth } from './auth/auth.js'; // Corrected path
-import { fetchConversations } from './db/conversation.js'; // Corrected path
-import { logError } from './utils/utils.js'; // Path was correct
+import { logError } from './utils/utils.js'; 
+import { checkAuth } from './api/auth/auth.js';
+import { fetchConversations } from './conversation/conversations.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const user = await checkAuth(supabase); // Ensure checkAuth accepts supabase client if needed
+        const user = await checkAuth(supabase);
         if (!user) {
             window.location.href = '/auth.html';
             return;
         }
 
-        const conversations = await fetchConversations(supabase); // Ensure fetchConversations accepts supabase client if needed
+        const teamId = user.teamId;
+
+        const conversations = await fetchConversations(teamId);
         console.log(conversations);
     } catch (error) {
         logError(error);

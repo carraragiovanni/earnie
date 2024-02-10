@@ -1,4 +1,5 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin'); // Import the plugin
 
 module.exports = {
   mode: 'production', // 'development' or 'production'
@@ -32,5 +33,12 @@ module.exports = {
     open: true,
     watchFiles: ['src/**/*', 'dist/**/*'], // Watch for changes in 'src' and 'dist' directories
   },
-  // Configure plugins if needed (e.g., HtmlWebpackPlugin, CleanWebpackPlugin, etc.)
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html', // Path to your source template
+      // filename: 'index.html' is the default value and can be omitted unless you wish to specify a different name
+    }),
+    // Add other plugins here as needed
+  ],
+  // Configure other plugins if needed
 };

@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import 'express-async-errors';
 import http from 'node:http';
+import path from 'node:path';
+import fs from 'node:fs';
 import express from 'express';
 import cors from 'cors';
 
@@ -20,9 +22,15 @@ import { twilioWebhooksRouter } from './routes/twilioWebhooks.js';
 const app = express();
 
 app.set('trust proxy', 1);
+
+const corsOrigin =
+  env.WEB_ORIGIN === '*'
+    ? true
+    : env.WEB_ORIGIN;
+
 app.use(
   cors({
-    origin: env.WEB_ORIGIN,
+    origin: corsOrigin,
     credentials: true
   })
 );
@@ -48,6 +56,16 @@ const io = createSocketServer(httpServer);
 
 app.use('/api', messagesRouter(io));
 app.use('/twilio', twilioWebhooksRouter(io));
+
+// Serve built web app (when present) for single-host deploys.
+const publicDir = path.resolve(process.cwd(), 'public');
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/twilio')) return next();
+    return res.sendFile(path.join(publicDir, 'index.html'));
+  });
+}
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

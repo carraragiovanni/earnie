@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:4000';
+// If VITE_API_BASE is unset, use same-origin (recommended for production single-host deploys).
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
 export function getToken() {
   return localStorage.getItem('token');

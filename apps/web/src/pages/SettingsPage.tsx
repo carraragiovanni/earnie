@@ -86,7 +86,8 @@ export default function SettingsPage() {
     }
   });
 
-  const webhookBase = (import.meta.env.VITE_API_BASE ?? 'http://localhost:4000') + '/twilio';
+  const apiBase = (import.meta.env.VITE_API_BASE ?? window.location.origin).replace(/\/$/, '');
+  const webhookBase = `${apiBase}/twilio`;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">

@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum ContactFieldType {
+  TEXT
+  NUMBER
+  DATE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  twilioConfigs TwilioConfig[]
+  inboxes       Inbox[]
+  contacts      Contact[]
+  contactFields ContactFieldDefinition[]
+}
+
+model TwilioConfig {
+  id                    String   @id @default(cuid())
+  userId                String
+  name                  String
+  accountSidEnc         String
+  authTokenEnc          String
+  messagingServiceSidEnc String?
+  createdAt             DateTime @default(now())
+
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inboxes Inbox[]
+
+  @@index([userId])
+}
+
+model Inbox {
+  id            String   @id @default(cuid())
+  userId        String
+  twilioConfigId String
+  name          String
+  aiEnabled     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  twilioConfig TwilioConfig @relation(fields: [twilioConfigId], references: [id], onDelete: Cascade)
+  phoneNumbers InboxPhoneNumber[]
+  conversations Conversation[]
+
+  @@index([userId])
+  @@index([twilioConfigId])
+}
+
+model InboxPhoneNumber {
+  id      String @id @default(cuid())
+  inboxId String
+  e164    String
+
+  inbox Inbox @relation(fields: [inboxId], references: [id], onDelete: Cascade)
+
+  @@unique([e164])
+  @@index([inboxId])
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String?
+  primaryPhone String
+  createdAt    DateTime @default(now())
+
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations Conversation[]
+  fieldValues   ContactFieldValue[]
+
+  @@unique([userId, primaryPhone])
+  @@index([userId])
+}
+
+model ContactFieldDefinition {
+  id        String           @id @default(cuid())
+  userId    String
+  key       String
+  label     String
+  type      ContactFieldType
+  createdAt DateTime         @default(now())
+
+  user   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  values ContactFieldValue[]
+
+  @@unique([userId, key])
+  @@index([userId])
+}
+
+model ContactFieldValue {
+  id          String   @id @default(cuid())
+  contactId   String
+  fieldDefId  String
+  valueText   String?
+  valueNumber Float?
+  valueDate   DateTime?
+
+  contact  Contact                @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  fieldDef ContactFieldDefinition @relation(fields: [fieldDefId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, fieldDefId])
+  @@index([contactId])
+  @@index([fieldDefId])
+}
+
+model Conversation {
+  id            String   @id @default(cuid())
+  inboxId       String
+  contactId     String
+  aiEnabled     Boolean  @default(false)
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  inbox    Inbox    @relation(fields: [inboxId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([inboxId, contactId])
+  @@index([inboxId])
+  @@index([contactId])
+}
+
+model Message {
+  id             String           @id @default(cuid())
+  conversationId String
+  direction      MessageDirection
+  from           String
+  to             String
+  body           String
+  mediaJson      String?
+  twilioSid      String?
+  status         String?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([twilioSid])
+}

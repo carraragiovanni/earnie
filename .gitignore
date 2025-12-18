@@ -1,0 +1,14 @@
+node_modules
+.env
+.env.*
+!.env.example
+/dist
+/build
+/.turbo
+/.cache
+/apps/**/dist
+/apps/**/.vite
+/apps/**/.next
+/apps/**/coverage
+/apps/api/prisma/dev.db
+/apps/api/prisma/dev.db-journal
